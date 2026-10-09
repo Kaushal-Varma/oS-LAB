@@ -227,3 +227,207 @@ int main()
 
     return 0;
 }
+
+
+dhcp commands---->
+enable
+conf t
+int f0/0
+ip add 10.0.0.1 255.0.0.0 
+no shutdown
+exit
+ip dhcp pool mypool
+network 10.0.0.2 255.0.0.0
+default-router 10.0.0.1
+exit
+
+
+Ospf--
+Router 0-
+enable
+Config t
+Router ospf 1
+Network 10.0.0.0 255.255.255.0 area0
+Network 12.0.0.0 255.255.255.0 area0
+Exit
+
+Ospf---
+ router 1---
+enable
+Config t
+Router ospf 1
+Network 11.0.0.0 0.0.0.255 area0
+Network 12.0.0.0 0.0.0.255 area0
+Exit
+
+
+
+
+
+
+OS LAB INTERNAL PROGRAMS
+
+========================================
+Q3 — BITMAP
+========================================
+AIM:
+To implement a bitmap for a memory of 32 blocks and display the bitmap pattern.
+
+DESCRIPTION:
+A bitmap uses 1 for allocated blocks and 0 for free blocks. The allocated blocks are 2, 3, 4, 5, 8, 9, 10, 11 and 12.
+
+CODE:
+#include <stdio.h>
+int main() {
+    int bitmap[32] = {0};
+    int allocated[] = {2,3,4,5,8,9,10,11,12};
+    int i;
+    for (i = 0; i < 9; i++)
+        bitmap[allocated[i]] = 1;
+    printf("Block : ");
+    for (i = 0; i < 32; i++) printf("%2d ", i);
+    printf("\nBit   : ");
+    for (i = 0; i < 32; i++) printf("%2d ", bitmap[i]);
+    printf("\nBitmap Pattern: ");
+    for (i = 0; i < 32; i++) printf("%d", bitmap[i]);
+    printf("\n");
+    return 0;
+}
+
+========================================
+Q8 — BEST FIT MEMORY ALLOCATION
+========================================
+AIM:
+To implement the Best Fit memory allocation algorithm.
+
+DESCRIPTION:
+Best Fit allocates a process to the smallest available memory block that is large enough. The remaining block size is updated after allocation.
+
+CODE:
+#include <stdio.h>
+int main() {
+    int block[20], process[20], allocation[20];
+    int n, m, i, j, best;
+    printf("Enter number of memory blocks: ");
+    scanf("%d", &n);
+    printf("Enter sizes of memory blocks:\n");
+    for (i = 0; i < n; i++) scanf("%d", &block[i]);
+    printf("Enter number of processes: ");
+    scanf("%d", &m);
+    printf("Enter sizes of processes:\n");
+    for (i = 0; i < m; i++) {
+        scanf("%d", &process[i]);
+        allocation[i] = -1;
+    }
+    for (i = 0; i < m; i++) {
+        best = -1;
+        for (j = 0; j < n; j++)
+            if (block[j] >= process[i] &&
+                (best == -1 || block[j] < block[best]))
+                best = j;
+        if (best != -1) {
+            allocation[i] = best;
+            block[best] -= process[i];
+        }
+    }
+    printf("Process\tSize\tBlock\n");
+    for (i = 0; i < m; i++) {
+        printf("P%d\t%d\t", i + 1, process[i]);
+        if (allocation[i] != -1)
+            printf("B%d\n", allocation[i] + 1);
+        else printf("Not Allocated\n");
+    }
+    return 0;
+}
+
+========================================
+Q1(i) — BASIC SHELL COMMANDS
+========================================
+AIM:
+To execute eight basic Linux shell commands.
+
+DESCRIPTION:
+Linux shell commands are used to list files, display directories, create, copy, move, view and remove files and directories.
+
+CODE:
+#!/bin/bash
+echo "Current Directory:"
+pwd
+echo "Files and Directories:"
+ls
+echo "Creating Directory:"
+mkdir testdir
+echo "Creating File:"
+touch test.txt
+echo "Copying File:"
+cp test.txt copy.txt
+echo "Moving File:"
+mv copy.txt testdir/
+echo "Displaying File:"
+cat test.txt
+echo "Removing File:"
+rm test.txt
+
+========================================
+Q1(ii) — EVEN OR ODD
+========================================
+AIM:
+To write a shell script to check whether a number is even or odd.
+
+DESCRIPTION:
+The script reads a number and uses the modulo operator. If the remainder after division by 2 is zero, the number is even; otherwise, it is odd.
+
+CODE:
+#!/bin/bash
+echo "Enter a number:"
+read n
+if [ $((n % 2)) -eq 0 ]
+then
+    echo "$n is even"
+else
+    echo "$n is odd"
+fi
+
+========================================
+Q7 — ROUND ROBIN SCHEDULING
+========================================
+AIM:
+To implement Round Robin scheduling and calculate average waiting time and turnaround time.
+
+DESCRIPTION:
+Round Robin gives each process a fixed time quantum. Unfinished processes return to the end of the ready queue. All processes arrive at time 0 and the time quantum is 1 ms.
+
+CODE:
+#include <stdio.h>
+int main() {
+    int bt[] = {10,1,2,1,5};
+    int rem[5], wt[5] = {0}, tat[5];
+    int i, time = 0, done = 0;
+    float awt = 0, atat = 0;
+    for (i = 0; i < 5; i++) rem[i] = bt[i];
+    while (done < 5) {
+        for (i = 0; i < 5; i++) {
+            if (rem[i] > 0) {
+                if (rem[i] > 1) {
+                    rem[i]--;
+                    time++;
+                } else {
+                    time++;
+                    rem[i] = 0;
+                    tat[i] = time;
+                    wt[i] = tat[i] - bt[i];
+                    done++;
+                }
+            }
+        }
+    }
+    printf("P\tBT\tWT\tTAT\n");
+    for (i = 0; i < 5; i++) {
+        printf("P%d\t%d\t%d\t%d\n", i+1, bt[i], wt[i], tat[i]);
+        awt += wt[i];
+        atat += tat[i];
+    }
+    printf("Average WT = %.2f\n", awt / 5);
+    printf("Average TAT = %.2f\n", atat / 5);
+    return 0;
+}
